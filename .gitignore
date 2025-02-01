@@ -3,3 +3,6 @@
 
 # Deno generated document files
 *docs
+
+# Prevent secret keys addition
+*.pem

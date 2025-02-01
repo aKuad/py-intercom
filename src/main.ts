@@ -1,12 +1,11 @@
 /**
  * Inter-communication system on web
  *
- * Temporary implementation: only audio client with echo API
- *
  * @author aKuad
  */
 
 import { serveDir } from "jsr:@std/http@1";
+import { parseArgs } from "jsr:@std/cli@^1.0.6/parse-args";
 
 import { main_audio } from "./modules/main_audio.ts";
 import { main_mixer } from "./modules/main_mixer.ts";
@@ -16,8 +15,20 @@ import { AudioMixer } from "./modules/AudioMixer.ts";
 const audio_mixer = new AudioMixer();
 let is_mixer_client_in_use = false;
 
+const args = parseArgs(Deno.args, {
+  boolean: ["tls"],
+  default: { tls: false }
+});
 
-Deno.serve(request => {
+
+const serve_conf = {
+  hostname: "0.0.0.0",
+  cert: args.tls ? Deno.readTextFileSync("cert.pem") : undefined,
+  key:  args.tls ? Deno.readTextFileSync("key.pem")  : undefined
+}
+
+
+Deno.serve(serve_conf, request => {
   const url = new URL(request.url);
 
   /* API endpoints */
